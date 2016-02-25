@@ -1,0 +1,66 @@
+---
+title: "Exercise Anova and Tukey test on Rivers data"
+author: "Emil Brohus"
+date: "25 February 2016"
+output: html_document
+---
+
+I found the way of assigning factor levels as shown during the lecture with the g vector of 1, 2 and 3s to be a bit laborious. However I could not get the aov and Tukey to work if not all the data was in one vector.
+
+```{r}
+data = read.table(url('https://raw.githubusercontent.com/EmBro/MDA/master/rivers.csv'), dec = ',', sep = ';', header = T)
+
+show(data)
+```
+
+I tried to rearrange in many ways, but found out in the end that by using the 'stack' function, it did all the work for me.
+
+```{r}
+data1 = stack(data)
+show(data1)
+```
+
+Data is now ready to be analyzed with boxplot, Anova and Tukey test
+
+But before, and just for the fun of it, I have decided to see normality with histograms. I found this need little package that does exactly that
+
+
+```{r}
+library(psych)
+multi.hist(data, freq = F, dcol = 'red')
+```
+
+It looks fairly normal distributed, however Ribe a little odd. I proceed with boxplot, Anova and tukey test
+
+```{r}
+boxplot(data1$values ~ data1$ind, horizontal = T,
+            xlab = 'Chlorine Content', ylab = 'River')
+```
+
+The boxplot gives us an indication about the differences, however we cannot conclude anything certain. It also reveals a slight outlier in the sample set of Ribe River.
+We proceed with the anova test.
+
+```{r}
+r = aov(data1$values ~ data1$ind)
+summary(r)
+
+```
+
+The anova test tells that within a 95% Confidence interval that there is a difference in the level of Chlorine in the rivers. However the anova test doesn't tell which one. Therefore the Tukey test
+
+```{r}
+Tukey = TukeyHSD(r)
+show(Tukey)
+```
+
+The result of the Tukey test allows us to conclude, that there is a difference in the mean level of chlorine in the rivers Varde-Skjern and Varde-Ribe. Since everything is different, there is a difference en mean chlorin content in rivers Skjern-Ribe, however in this sample it is not significant.
+
+
+
+
+
+
+
+
+
+
